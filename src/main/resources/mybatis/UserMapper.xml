@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.pengjunlee.service.mapper.UserMapper">
+
+    <select id="pageUserByCond" resultType="com.pengjunlee.domain.UserEntity">
+        SELECT * FROM tbl_user
+        <where>
+            <if test="name !=null and name != ''">
+                AND name LIKE "%"#{name}"%"
+            </if>
+            <if test="nickName !=null and nickName != ''">
+                AND nick_name LIKE "%"#{nickName}"%"
+            </if>
+            <if test="locked !=null and locked != ''">
+                AND locked = #{locked}
+            </if>
+            <if test="roles !=null and roles != ''">
+                <choose>
+                    <when test="roles == 1">
+                        AND INSTR(roles,'admin')>0
+                    </when>
+                    <when test="roles == 0">
+                        AND INSTR(roles,'editor')>0
+                    </when>
+
+                </choose>
+            </if>
+        </where>
+        <choose>
+            <when test="sortBy !=null and sortOrder != null">
+                ORDER BY ${sortBy} ${sortOrder}
+            </when>
+            <otherwise>
+                ORDER BY id asc
+            </otherwise>
+        </choose>
+
+        <if test="offset != null and limit != null">
+            LIMIT ${offset},${limit}
+        </if>
+
+    </select>
+
+    <select id="countUserByCond" resultType="int">
+        select count(id) from tbl_user
+        <where>
+            <if test="name !=null and name != ''">
+                AND name LIKE "%"#{name}"%"
+            </if>
+            <if test="nickName !=null and nickName != ''">
+                AND nick_name LIKE "%"#{nickName}"%"
+            </if>
+            <if test="locked !=null and locked != ''">
+                AND locked = #{locked}
+            </if>
+            <if test="roles !=null and roles != ''">
+                <choose>
+                    <when test="roles == 1">
+                        AND INSTR(roles,'admin')>0
+                    </when>
+                    <when test="roles == 0">
+                        AND INSTR(roles,'editor')>0
+                    </when>
+
+                </choose>
+            </if>
+        </where>
+    </select>
+
+
+</mapper>
