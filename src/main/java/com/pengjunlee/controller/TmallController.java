@@ -17,13 +17,13 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/tmall")
-public class TmallController {
+@CrossOrigin
+public class TmallController{
 
     @Autowired
     private TmallService tmallService;
 
     @GetMapping("/shop/list")
-    @RequiresRoles(value = {"admin"})
     public Object shopList(@RequestParam Map<String, Object> params) {
         PageUtil pageUtil = tmallService.pageShopByCond(params);
         BaseResponse<Object> ret = new BaseResponse<Object>(pageUtil);
@@ -33,7 +33,6 @@ public class TmallController {
     }
 
     @GetMapping("/shop/update/{shopId}")
-    @RequiresRoles(value = {"admin"})
     public Object shopUpdate(@PathVariable(name = "shopId") Long shopId) {
         tmallService.updateShopById(shopId);
         BaseResponse<Object> ret = new BaseResponse<Object>();
@@ -43,7 +42,6 @@ public class TmallController {
     }
 
     @GetMapping("/goods/list")
-    @RequiresRoles(value = {"admin"})
     public Object goodsList(@RequestParam Map<String, Object> params) {
         System.out.println(params);
         PageUtil pageUtil = tmallService.pageGoodsByCond(params);

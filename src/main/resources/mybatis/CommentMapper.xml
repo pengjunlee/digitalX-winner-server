@@ -3,14 +3,34 @@
 <mapper namespace="com.pengjunlee.service.mapper.CommentMapper">
     <select id="pageCommentGoods" resultType="com.pengjunlee.domain.CommentGoodsEntity">
         select
-        * from tbl_rate_goods order by id desc
+        * from tbl_tmall_goods
+        <where>
+            <if test="title !=null and title != ''">
+                AND title LIKE "%"#{title}"%"
+            </if>
+        </where>
+        <choose>
+            <when test="sortBy !=null and sortOrder != null">
+                ORDER BY ${sortBy} ${sortOrder}
+            </when>
+            <otherwise>
+                ORDER BY id asc
+            </otherwise>
+        </choose>
+
         <if test="offset != null and limit != null">
-            limit #{offset}, #{limit}
+            LIMIT ${offset},${limit}
         </if>
 
     </select>
 
     <select id="countCommentGoods" resultType="int">
-        select count(*) from tbl_rate_goods
+        select count(*)
+        from tbl_tmall_goods
+        <where>
+            <if test="title !=null and title != ''">
+                AND title LIKE "%"#{title}"%"
+            </if>
+        </where>
     </select>
 </mapper>

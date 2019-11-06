@@ -6,6 +6,7 @@ import com.pengjunlee.domain.UserAuthInfo;
 import com.pengjunlee.domain.UserEntity;
 import com.pengjunlee.service.UserService;
 import com.pengjunlee.utils.PageUtil;
+import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.apache.shiro.crypto.hash.SimpleHash;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,6 +19,7 @@ import java.util.Map;
  */
 @RequestMapping("/api/v1/user")
 @RestController
+@CrossOrigin
 public class UserController {
 
     @Resource
@@ -37,12 +39,12 @@ public class UserController {
 
 
     @PostMapping("/create")
+    @RequiresRoles(value = {"admin"})
     public Object createUser(@RequestBody UserEntity userEntity) {
         // 设置默认字段
         String password = new SimpleHash("SHA-1", "123456", userEntity.getName(), 16).toString();
         userEntity.setPassword(password);
         userEntity.setLocked(false);
-        userEntity.beforeSave();
         boolean save = userService.save(userEntity);
 
         BaseResponse<Object> ret = new BaseResponse<Object>();
@@ -112,6 +114,7 @@ public class UserController {
     }
 
     @DeleteMapping("/delete/{id}")
+    @RequiresRoles(value = {"admin"})
     public Object userList(@PathVariable(name = "id") Long id) {
         BaseResponse<Object> ret = new BaseResponse<Object>();
         boolean b = userService.removeById(id);

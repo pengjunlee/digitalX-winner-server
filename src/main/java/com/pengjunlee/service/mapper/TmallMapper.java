@@ -2,7 +2,6 @@ package com.pengjunlee.service.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.pengjunlee.domain.TmallShopEntity;
-import com.pengjunlee.domain.UserEntity;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -19,6 +18,5 @@ public interface TmallMapper extends BaseMapper<TmallShopEntity> {
 
     int countShopByCond(Map<String, Object> map);
 
-    void updateShopById(Map<String, Object> map);
 
 }

@@ -31,17 +31,17 @@ public class CommentController {
 
 
     @GetMapping(value = "/goods")
-    public Object listGoods(@RequestParam("page") int page) {
-        PageUtil pageUtil = commentService.pageCommentGoods(page);
+    public Object listGoods(@RequestParam Map<String, Object> params) {
+        PageUtil pageUtil = commentService.pageCommentGoodsByCond(params);
         BaseResponse<Object> ret = new BaseResponse<Object>(pageUtil);
         ret.setCode(0);
         ret.setMessage("数据加载成功");
         return ret;
     }
 
-    @GetMapping(value = "/{goodsId}")
-    public Object lisComments(@PathVariable(name = "goodsId") String goodsId, @RequestParam("page") int page) {
-        PageUtil pageUtil = commentService.pageCommentByGoods(goodsId, page);
+    @GetMapping(value = "/list")
+    public Object lisComments(@RequestParam Map<String, Object> params) {
+        PageUtil pageUtil = commentService.pageCommentByGoods(params);
         BaseResponse<Object> ret = new BaseResponse<Object>(pageUtil);
         ret.setCode(0);
         ret.setMessage("数据加载成功");
@@ -49,10 +49,10 @@ public class CommentController {
     }
 
 
-    @GetMapping(value = "/rateword/{goodsId}")
-    public Object lisRatewords(@PathVariable(name = "goodsId") String goodsId) {
+    @GetMapping(value = "/words/{goodsId}")
+    public Object lisRatewords(@PathVariable(name = "goodsId") Long goodsId) {
 
-        String key = RATEWORD_PREFIX + goodsId;
+        String key = RATEWORD_PREFIX + goodsId.toString();
 
 
         List<RateWord> values = null;
@@ -82,10 +82,7 @@ public class CommentController {
             redisUtil.set(key, values);
         }
         BaseResponse<Object> ret = new BaseResponse<Object>();
-
-        Map<String, Object> data = new HashMap<>();
-        data.put("ratewords", values);
-        ret.setData(data);
+        ret.setData(values);
         ret.setCode(0);
         ret.setMessage("数据加载成功");
         return ret;

@@ -1,9 +1,13 @@
 package com.pengjunlee.service.impl;
 
-import com.pengjunlee.domain.*;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.pengjunlee.domain.CommentEntity;
+import com.pengjunlee.domain.CommentGoodsEntity;
+import com.pengjunlee.domain.TmallGoodsEntity;
 import com.pengjunlee.service.CommentService;
 import com.pengjunlee.service.mapper.CommentMapper;
 import com.pengjunlee.utils.PageUtil;
+import com.pengjunlee.utils.TmallUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -12,17 +16,16 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * @author pengjunlee
  * @create 2019-09-03 17:19
  */
 @Service
-public class CommentServiceImpl implements CommentService {
+public class CommentServiceImpl extends ServiceImpl<CommentMapper, CommentGoodsEntity> implements CommentService {
 
     @Resource
     private CommentMapper CommentMapper;
@@ -32,33 +35,57 @@ public class CommentServiceImpl implements CommentService {
 
 
     @Override
-    public PageUtil pageCommentGoods(int page) {
-        Integer limit = 100;
-        Integer offset = (page - 1) * limit;
-        List<CommentGoodsEntity> commentGoodsEntities = CommentMapper.pageCommentGoods(offset, limit);
-        int count = CommentMapper.countCommentGoods();
+    public PageUtil pageCommentGoodsByCond(Map<String, Object> map) {
+        Integer offset = TmallUtil.getOffsetFromParams(map);
+        map.put("offset", offset);
+        List<CommentGoodsEntity> commentGoodsEntities = CommentMapper.pageCommentGoods(map);
+        int count = CommentMapper.countCommentGoods(map);
         return new PageUtil(commentGoodsEntities, count);
     }
 
 
     @Override
-    public List<CommentEntity> listCommentByGoods(String goodsId) {
-        Query query = new Query(Criteria.where("goodsId").is(Long.parseLong(goodsId)));
-        List<CommentEntity> tmallCommentEntities = mongoTemplate.find(query, CommentEntity.class, "tmallRateEntity");
-        return tmallCommentEntities;
+    public List<CommentEntity> listCommentByGoods(Long goodsId) {
+        // 获取数据
+        Query query = new Query(Criteria.where("goodsId").is(goodsId));
+        List<CommentEntity> commentEntities = mongoTemplate.find(query, CommentEntity.class, "tmallRateEntity");
+        return commentEntities;
     }
 
     @Override
-    public PageUtil pageCommentByGoods(String goodsId, int page) {
-        int offset = (page - 1) * 100;
-        Query query = new Query(Criteria.where("goodsId").is(Long.parseLong(goodsId)));
+    public PageUtil pageCommentByGoods(Map<String, Object> map) {
         // 获取数据条数
-        int count = mongoTemplate.find(query, CommentEntity.class, "tmallRateEntity").size();
-        // 获取数据内容
-        query.with(new Sort(Sort.Direction.valueOf("DESC"), "rateDate"));
-        query.skip(offset);
-        query.limit(100);
-        List<CommentEntity> tmallCommentEntities = mongoTemplate.find(query, CommentEntity.class, "tmallRateEntity");
-        return new PageUtil(tmallCommentEntities, count);
+        Query countQuery = getCommentQueryFromMap(map, false);
+        int count = mongoTemplate.find(countQuery, CommentEntity.class, "tmallRateEntity").size();
+
+        Query pageQuery = getCommentQueryFromMap(map, true);
+        Integer offset = TmallUtil.getOffsetFromParams(map);
+        pageQuery.skip(offset);
+        pageQuery.limit(new Integer(map.get("limit").toString()));
+        List<CommentEntity> commentEntities = mongoTemplate.find(pageQuery, CommentEntity.class, "tmallRateEntity");
+        return new PageUtil(commentEntities, count);
+    }
+
+    private Query getCommentQueryFromMap(Map<String, Object> map, boolean sorted) {
+        // 获取数据条数
+        Query query = new Query(Criteria.where("goodsId").is(Long.parseLong(map.get("goodsId").toString())));
+        if (map.get("content") != null && map.get("content").toString().trim() !="") {
+            Pattern pattern = Pattern.compile("^.*" + map.get("content").toString().trim() + ".*$", Pattern.CASE_INSENSITIVE);
+            query.addCriteria(new Criteria().orOperator(Criteria.where("content").regex(pattern), Criteria.where("appendComment.content").regex(pattern)));
+        }
+        if (map.get("appendComment") != null && map.get("appendComment").toString().trim() != "") {
+            if(map.get("appendComment").toString().equals("1")){
+                query.addCriteria(Criteria.where("appendComment").ne(null));
+            }else{
+                query.addCriteria(Criteria.where("appendComment").is(null));
+            }
+
+        }
+        if (sorted) {
+            String sort_by = map.get("sortBy") == null ? "rateDate" : map.get("sortBy").toString();
+            String sort_order = map.get("sortOrder") == null ? "DESC" : map.get("sortOrder").toString();
+            query.with(new Sort(Sort.Direction.valueOf(sort_order), sort_by));
+        }
+        return query;
     }
 }

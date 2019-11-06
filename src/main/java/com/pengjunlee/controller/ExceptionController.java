@@ -31,8 +31,8 @@ public class ExceptionController {
     @ExceptionHandler(Exception.class)
     public Object globalException(HttpServletRequest request, Throwable ex) {
         BaseResponse<Object> ret = new BaseResponse<Object>();
-        ret.setCode(500);
-        ret.setMessage(ex.getMessage());
+        ret.setCode(-1);
+        ret.setMessage("请求失败："+ex.getMessage());
         return ret;
     }
 }

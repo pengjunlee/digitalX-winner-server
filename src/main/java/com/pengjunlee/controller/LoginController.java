@@ -4,7 +4,10 @@ package com.pengjunlee.controller;
 import com.pengjunlee.config.jwt.JwtUtils;
 import com.pengjunlee.domain.BaseResponse;
 import com.pengjunlee.domain.UserAuthInfo;
+import com.pengjunlee.domain.VerifyCode;
+import com.pengjunlee.service.IVerifyCodeGen;
 import com.pengjunlee.service.UserService;
+import com.pengjunlee.service.impl.SimpleCharVerifyCodeGenImpl;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.subject.Subject;
@@ -12,7 +15,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -21,6 +26,7 @@ import java.util.Map;
  */
 @RequestMapping("/api/v1")
 @RestController
+@CrossOrigin
 public class LoginController {
 
     @Autowired
@@ -78,6 +84,34 @@ public class LoginController {
         BaseResponse<Object> ret = new BaseResponse<Object>();
         ret.setCode(0);
         ret.setMessage("退出登录");
+        return ret;
+    }
+
+    @GetMapping("/verifycode")
+    public Object getGerifyCode(HttpServletRequest request, HttpServletResponse response) {
+        IVerifyCodeGen iVerifyCodeGen = new SimpleCharVerifyCodeGenImpl();
+        BaseResponse<Object> ret = new BaseResponse<Object>();
+
+        try {
+            //设置长宽
+            VerifyCode verifyCode = iVerifyCodeGen.generate(80, 30);
+            String code = verifyCode.getCode();
+
+            //设置响应头
+            response.setHeader("Pragma", "no-cache");
+            //设置响应头
+            response.setHeader("Cache-Control", "no-cache");
+            //在代理服务器端防止缓冲
+            response.setDateHeader("Expires", 0);
+            ret.setCode(0);
+            ret.setMessage("退出登录");
+            ret.setData(verifyCode);
+        } catch (IOException e) {
+            ret.setCode(-1);
+            ret.setMessage("获取验证码失败");
+            System.out.println(e);
+        }
+
         return ret;
     }
 }

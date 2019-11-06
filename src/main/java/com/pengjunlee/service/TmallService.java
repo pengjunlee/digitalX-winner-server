@@ -1,9 +1,11 @@
 package com.pengjunlee.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.pengjunlee.domain.TmallGoodsEntity;
 import com.pengjunlee.domain.TmallShopEntity;
 import com.pengjunlee.utils.PageUtil;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -15,6 +17,8 @@ public interface TmallService extends IService<TmallShopEntity> {
     PageUtil pageShopByCond(Map<String, Object> map);
 
     PageUtil pageGoodsByCond(Map<String, Object> map);
+
+    List<TmallGoodsEntity> listGoodsByCond(Map<String, Object> map);
 
     boolean updateShopById(Long shopId);
 }

@@ -16,21 +16,4 @@ public class BaseDomain {
 
     private Date updatedTime;
 
-    private Long createdBy;
-
-    private Long updatedBy;
-
-    public void beforeSave() {
-        Date now = new Date();
-        this.setCreatedTime(now);
-        this.setUpdatedTime(now);
-        this.setCreatedBy(1L);
-        this.setUpdatedBy(1L);
-    }
-
-    public void beforeUpdate() {
-        Date now = new Date();
-        this.setUpdatedTime(now);
-        this.setUpdatedBy(1L);
-    }
 }
