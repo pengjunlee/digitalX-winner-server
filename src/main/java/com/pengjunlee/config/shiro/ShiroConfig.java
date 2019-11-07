@@ -8,6 +8,7 @@ import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.authc.pam.AuthenticationStrategy;
 import org.apache.shiro.authc.pam.FirstSuccessfulStrategy;
 import org.apache.shiro.authc.pam.ModularRealmAuthenticator;
+import org.apache.shiro.cache.ehcache.EhCacheManager;
 import org.apache.shiro.mgt.DefaultSessionStorageEvaluator;
 import org.apache.shiro.mgt.DefaultSubjectDAO;
 import org.apache.shiro.mgt.SecurityManager;
@@ -173,7 +174,17 @@ public class ShiroConfig {
         subjectDAO.setSessionStorageEvaluator(sessionStorageEvaluator());
         securityManager.setSubjectDAO(subjectDAO);
 
+        //配置 ehcache缓存管理器
+        securityManager.setCacheManager(ehCacheManager());
         return securityManager;
+    }
+
+
+    @Bean
+    public EhCacheManager ehCacheManager() {
+        EhCacheManager em = new EhCacheManager();
+        em.setCacheManagerConfigFile("classpath:ehcache.xml");
+        return em;
     }
 
 }

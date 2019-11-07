@@ -82,9 +82,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, CommentGoodsE
 
         }
         if (sorted) {
-            String sort_by = map.get("sortBy") == null ? "rateDate" : map.get("sortBy").toString();
-            String sort_order = map.get("sortOrder") == null ? "DESC" : map.get("sortOrder").toString();
-            query.with(new Sort(Sort.Direction.valueOf(sort_order), sort_by));
+            query.with(new Sort(Sort.Direction.valueOf("DESC"), "rateDate"));
         }
         return query;
     }

@@ -1,5 +1,6 @@
 package com.pengjunlee.controller;
 
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.pengjunlee.domain.BaseResponse;
 import org.apache.shiro.ShiroException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -17,10 +18,16 @@ import javax.servlet.http.HttpServletResponse;
 
 public class ExceptionController {
 
+    /**
+     * 自定义状态码：
+     * 0 表示成功获取到响应；
+     * -1 表示通用获取响应失败；
+     * -2 表示由于鉴权引起的响应失败；
+     */
+
     // 捕捉shiro的异常
-    @ExceptionHandler(ShiroException.class)
+    @ExceptionHandler({ShiroException.class, JWTVerificationException.class})
     public Object handleShiroException(ShiroException e, HttpServletResponse response) {
-        response.setStatus(401);
         BaseResponse<Object> ret = new BaseResponse<Object>();
         ret.setCode(-2);
         ret.setMessage(e.getMessage());
@@ -32,7 +39,7 @@ public class ExceptionController {
     public Object globalException(HttpServletRequest request, Throwable ex) {
         BaseResponse<Object> ret = new BaseResponse<Object>();
         ret.setCode(-1);
-        ret.setMessage("请求失败："+ex.getMessage());
+        ret.setMessage(ex.getMessage());
         return ret;
     }
 }

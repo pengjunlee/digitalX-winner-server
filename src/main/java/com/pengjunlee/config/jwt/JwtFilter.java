@@ -119,9 +119,9 @@ public class JwtFilter extends BasicHttpAuthenticationFilter {
         HttpServletResponse httpResponse = WebUtils.toHttp(servletResponse);
         httpResponse.setCharacterEncoding("UTF-8");
         httpResponse.setContentType("application/json;charset=UTF-8");
-        httpResponse.setStatus(HttpStatus.UNAUTHORIZED.value());
+        // httpResponse.setStatus(HttpStatus.UNAUTHORIZED.value());
         PrintWriter writer = httpResponse.getWriter();
-        writer.write("{\"errCode\": 401, \"msg\": \"UNAUTHORIZED\"}");
+        writer.write("{\"code\": -2, \"message\": \"UNAUTHORIZED\"}");
         fillCorsHeader(WebUtils.toHttp(servletRequest), httpResponse);
         return false;
     }

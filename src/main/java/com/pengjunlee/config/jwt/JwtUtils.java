@@ -1,12 +1,5 @@
 package com.pengjunlee.config.jwt;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import org.apache.shiro.crypto.SecureRandomNumberGenerator;
-
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTCreator.Builder;
 import com.auth0.jwt.JWTVerifier;
@@ -16,6 +9,12 @@ import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import org.apache.shiro.crypto.SecureRandomNumberGenerator;
+
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * @author pengjunlee
@@ -23,10 +22,10 @@ import com.auth0.jwt.interfaces.DecodedJWT;
  */
 public class JwtUtils {
     // 过期时间5分钟
-    private static final long EXPIRE_TIME = 60 * 60 * 1000;
+    private static final long EXPIRE_TIME = 60 * 15 * 1000;
 
     // 私钥
-    public static final String SECRET = "SECRET_VALUE";
+    public static final String SECRET = "pengjunlee";
 
     // 请求头
     public static final String AUTH_HEADER = "x-authorization-with";
